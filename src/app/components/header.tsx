@@ -63,15 +63,15 @@ export default function Header() {
           />
         </Flex>
         <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
-          <Text
+          {/* <Text
             textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
             fontFamily={'heading'}
             color={useColorModeValue('gray.800', 'white')}
           >
             Logo
-          </Text>
+          </Text> */}
 
-          <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
+          <Flex display={{ base: 'none', md: 'flex' }}>
             <DesktopNav />
           </Flex>
         </Flex>
@@ -88,9 +88,9 @@ export default function Header() {
             fontSize={'sm'}
             fontWeight={400}
             variant={'link'}
-            href={'#'}
+            href={'/login'}
           >
-            Sign In
+            Log In
           </Button>
           <Button
             as={'a'}
@@ -306,6 +306,10 @@ interface NavItem {
 
 const NAV_ITEMS: Array<NavItem> = [
   {
+    label: 'Home',
+    href: '/'
+  },
+  {
     label: 'Inspiration',
     children: [
       {
@@ -335,12 +339,4 @@ const NAV_ITEMS: Array<NavItem> = [
       }
     ]
   },
-  {
-    label: 'Learn Design',
-    href: '#'
-  },
-  {
-    label: 'Hire Designers',
-    href: '#'
-  }
 ];
