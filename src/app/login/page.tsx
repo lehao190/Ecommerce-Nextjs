@@ -55,10 +55,10 @@ export default function SimpleCard() {
                 <Link color={'blue.400'}>Forgot password?</Link>
               </Stack>
               <Button
-                bg={'blue.400'}
+                bg={'pink.400'}
                 color={'white'}
                 _hover={{
-                  bg: 'blue.500'
+                  bg: 'pink.500'
                 }}
               >
                 Sign in
