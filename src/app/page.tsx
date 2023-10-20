@@ -5,7 +5,6 @@ export default function Home() {
     <main>
       Main page
       <h1 className="text-3xl font-bold underline bg-red-50">Hello, Next.js!</h1>
-      <Button>Click me</Button>
     </main>
   )
 }
