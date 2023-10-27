@@ -15,6 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
+import { signIn, signOut } from 'next-auth/react';
 
 type Props = {};
 
@@ -45,7 +46,13 @@ const Login = (props: Props) => {
   const onSubmit = (values: z.infer<typeof loginSchema>) => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
+
+    signIn('credentials', {
+      redirect: false,
+      callbackUrl: `/register`,
+      email: values.email,
+      password: values.password,
+    });
   };
 
   return (
@@ -101,6 +108,7 @@ const Login = (props: Props) => {
                   <Link
                     href="/login#"
                     className="text-sm font-medium text-primary hover:underline dark:text-primary-500"
+                    onClick={() => signOut({ redirect: false })}
                   >
                     Forgot password?
                   </Link>
