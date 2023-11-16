@@ -1,5 +1,5 @@
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "./api/auth/[...nextauth]/route";
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from './api/auth/[...nextauth]/route';
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -8,5 +8,5 @@ export default async function Home() {
       Main page
       {JSON.stringify(session?.user, null, 2)}
     </main>
-  )
+  );
 }

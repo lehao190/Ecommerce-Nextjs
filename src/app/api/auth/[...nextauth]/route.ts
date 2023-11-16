@@ -1,25 +1,48 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { gql } from 'graphql-request';
+import { TUser } from '@/types/user.types';
+import { initializeGraphqlClient } from '@/lib/graphql';
+
+// Login response from Graphql Server
+type TLoginResponse = {
+  login: {
+    access_token: string;
+    refresh_token: string;
+    user: Omit<TUser, 'accessToken' | 'refreshToken'>;
+  }
+};
 
 export const authOptions: NextAuthOptions = {
-  // secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: '/login'
   },
-  session: { 
-    strategy: 'jwt',
+  session: {
+    strategy: 'jwt'
   },
   callbacks: {
     jwt: async ({ token, user }) => {
-      if(user) {
-        token.accessToken = user.accessToken;
+      if (user) {
+        token = {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          accessToken: user.accessToken,
+          refreshToken: user.refreshToken,
+        };
       }
 
-      return token
+      return token;
     },
     session: async ({ session, token }) => {
-      session.user.accessToken = token.accessToken;
-      return session
+      session = {
+        ...session,
+        user: {
+          ...token
+        }
+      };
+
+      return session;
     },
   },
   providers: [
@@ -28,32 +51,45 @@ export const authOptions: NextAuthOptions = {
       name: 'Login',
       credentials: {
         email: { label: 'Email', type: 'text' },
-        password: { label: 'Password', type: 'password' },
+        password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
-        return {
-          email: credentials?.email,
-          name: 'Hello world',
-          accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
-        } as any
+        const loginCredentials = gql`
+          mutation Login($email: String!, $password: String!) {
+            login(loginInput: { email: $email, password: $password }) {
+              access_token
+              refresh_token
+              user {
+                id
+                username
+                email
+                avatar
+              }
+            }
+          }
+        `;
 
-        // const res = await fetch('/your/endpoint', {
-        //   method: 'POST',
-        //   body: JSON.stringify(credentials),
-        //   headers: { 'Content-Type': 'application/json' }
-        // });
-        // const user = await res.json();
+        const { login: data } = await initializeGraphqlClient().request<TLoginResponse>(
+          loginCredentials,
+          {
+            email: credentials?.email,
+            password: credentials?.password
+          }
+        );
 
-        // // // If no error and we have user data, return it
-        // if (res.ok && user) {
-        //   return user;
-        // }
-        // // Return null if user data could not be retrieved
-        // return null;
+        if(data) {
+          return {
+            accessToken: data.access_token,
+            refreshToken: data.refresh_token,
+            ...data.user,
+          }
+        }
+
+        return null;
       }
     })
   ]
-}
+};
 
 const handler = NextAuth(authOptions);
 

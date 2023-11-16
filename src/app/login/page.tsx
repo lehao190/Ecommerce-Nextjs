@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { signIn, signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation'
 
 type Props = {};
 
@@ -34,6 +35,8 @@ const loginSchema = z.object({
 });
 
 const Login = (props: Props) => {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -43,16 +46,22 @@ const Login = (props: Props) => {
   });
 
   // // 2. Define a submit handler.
-  const onSubmit = (values: z.infer<typeof loginSchema>) => {
+  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
 
-    signIn('credentials', {
+    const response = await signIn('credentials', {
       redirect: false,
-      callbackUrl: `/register`,
       email: values.email,
       password: values.password,
     });
+
+    if(response?.ok) {
+      router.push('/');
+    } else {
+      console.error('Server error: ', response?.error);
+      return;
+    }
   };
 
   return (
