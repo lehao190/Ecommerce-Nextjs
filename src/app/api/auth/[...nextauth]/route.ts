@@ -9,8 +9,17 @@ type TLoginResponse = {
   login: {
     access_token: string;
     refresh_token: string;
+    expires_at: number;
     user: Omit<TUser, 'accessToken' | 'refreshToken'>;
-  }
+  };
+};
+
+type TRefreshTokenResponse = {
+  refresh: {
+    access_token: string;
+    refresh_token: string;
+    expires_at: number;
+  };
 };
 
 export const authOptions: NextAuthOptions = {
@@ -22,17 +31,39 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     jwt: async ({ token, user }) => {
+      // Initial login info
       if (user) {
-        token = {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          accessToken: user.accessToken,
-          refreshToken: user.refreshToken,
+        return token = {
+          ...user
         };
       }
+      // Return data if token is still valid
+      else if (token.expires_at > Math.floor(Date.now() / 1000)) {
+        return token;
+      }
+      // Refresh the tokens if access_token expires
+      else {
+        const refreshTokenQuery = gql`
+          query {
+            refresh {
+              access_token
+              refresh_token
+              expires_at
+            }
+          }
+        `;
 
-      return token;
+        const { refresh: data } = await initializeGraphqlClient(
+          token.refreshToken
+        ).request<TRefreshTokenResponse>(refreshTokenQuery);
+
+        return {
+          ...token,
+          accessToken: data.access_token,
+          refreshToken: data.refresh_token,
+          expires_at: data.expires_at
+        };
+      }
     },
     session: async ({ session, token }) => {
       session = {
@@ -43,7 +74,7 @@ export const authOptions: NextAuthOptions = {
       };
 
       return session;
-    },
+    }
   },
   providers: [
     CredentialsProvider({
@@ -59,6 +90,7 @@ export const authOptions: NextAuthOptions = {
             login(loginInput: { email: $email, password: $password }) {
               access_token
               refresh_token
+              expires_at
               user {
                 id
                 username
@@ -69,20 +101,22 @@ export const authOptions: NextAuthOptions = {
           }
         `;
 
-        const { login: data } = await initializeGraphqlClient().request<TLoginResponse>(
-          loginCredentials,
-          {
-            email: credentials?.email,
-            password: credentials?.password
-          }
-        );
+        const { login: data } =
+          await initializeGraphqlClient().request<TLoginResponse>(
+            loginCredentials,
+            {
+              email: credentials?.email,
+              password: credentials?.password
+            }
+          );
 
-        if(data) {
+        if (data) {
           return {
             accessToken: data.access_token,
             refreshToken: data.refresh_token,
             ...data.user,
-          }
+            expires_at: data.expires_at
+          };
         }
 
         return null;
