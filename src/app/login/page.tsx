@@ -45,11 +45,7 @@ const Login = (props: Props) => {
     }
   });
 
-  // // 2. Define a submit handler.
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-
     const response = await signIn('credentials', {
       redirect: false,
       email: values.email,

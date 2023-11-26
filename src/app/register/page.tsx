@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Form,
   FormControl,
@@ -15,11 +16,16 @@ import {
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
+import { Camera, XCircle } from 'lucide-react';
 
-type Props = {};
+const ACCEPTED_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
+const ONE_MEGABYTE = 1 * 1024 * 1024;
 
 const signUpSchema = z
   .object({
+    username: z.string().min(8, {
+      message: 'Username must be at least 8 characters'
+    }),
     email: z
       .string()
       .min(8, {
@@ -33,27 +39,36 @@ const signUpSchema = z
     }),
     confirmPassword: z.string().min(8, {
       message: 'Email must be at leaset 8 characters.'
-    })
+    }),
+    avatar: z
+      .custom<File>()
+      .refine((file) => file.size < ONE_MEGABYTE, {
+        message: 'The file must be below 1 MB.'
+      })
+      .refine((file) => ACCEPTED_MIME_TYPES.includes(file.type), {
+        message: 'The file must be of PNG, JPEG, JPG formats.'
+      })
+      .optional()
   })
   .refine(({ password, confirmPassword }) => password === confirmPassword, {
     message: 'Passwords must match!',
     path: ['confirmPassword'] // path of error
   });
 
-const Register = (props: Props) => {
+const Register = () => {
+  const [avatar, setAvatar] = useState<string | undefined>(undefined);
+
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
+      username: '',
       email: '',
       password: '',
       confirmPassword: ''
     }
   });
 
-  // // 2. Define a submit handler.
   const onSubmit = (values: z.infer<typeof signUpSchema>) => {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     console.log(values);
   };
 
@@ -70,6 +85,23 @@ const Register = (props: Props) => {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-4 md:space-y-6"
               >
+                <FormField
+                  control={form.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Username</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          placeholder="name@company.com"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="email"
@@ -118,6 +150,59 @@ const Register = (props: Props) => {
                           placeholder="••••••••"
                           {...field}
                         />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="avatar"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Upload file</FormLabel>
+                      <FormControl>
+                        <div className="flex justify-center items-center bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                          <label htmlFor="avatar-input">
+                            {avatar ? (
+                              <Avatar className="h-[80px] w-[80px]">
+                                <AvatarImage src={avatar} />
+                                <AvatarFallback className="bg-inherit">
+                                  <XCircle
+                                    size={80}
+                                    strokeWidth={1}
+                                    color="red"
+                                  />
+                                </AvatarFallback>
+                              </Avatar>
+                            ) : (
+                              <Camera
+                                className=" text-pink-500"
+                                size={80}
+                                strokeWidth={1}
+                              />
+                            )}
+                          </label>
+
+                          <Input
+                            id="avatar-input"
+                            type="file"
+                            onChange={(e) => {
+                              field.onChange(
+                                e.target.files ? e.target.files[0] : null
+                              );
+
+                              if (e.target.files?.length) {
+                                setAvatar(
+                                  URL.createObjectURL(e.target.files[0])
+                                );
+                              } else {
+                                setAvatar(undefined);
+                              }
+                            }}
+                            className="hidden"
+                          />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
