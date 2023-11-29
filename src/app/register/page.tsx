@@ -100,9 +100,9 @@ const Register = () => {
     });
   };
 
-  const signUp = async (values: z.infer<typeof signUpSchema> ) => {
+  const signUp = async (values: z.infer<typeof signUpSchema>) => {
     let base64Avatar: string | null = null;
-    
+
     if (values.avatar) {
       base64Avatar = await convertFileToBase64(values.avatar);
     }
@@ -169,8 +169,8 @@ const Register = () => {
   };
 
   return (
-    <section className="bg-gray-50 dark:bg-gray-900">
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen lg:py-0">
+    <section className="bg-gray-50 dark:bg-gray-900 py-[80px]">
+      <div className="flex flex-col items-center justify-center h-screen">
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tighter md:text-2xl">
@@ -258,27 +258,28 @@ const Register = () => {
                     <FormItem>
                       <FormLabel>Upload file</FormLabel>
                       <FormControl>
-                        <div className="flex justify-center items-center bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                          <label htmlFor="avatar-input">
-                            {avatar ? (
-                              <Avatar className="h-[80px] w-[80px]">
-                                <AvatarImage src={avatar} />
-                                <AvatarFallback className="bg-inherit">
-                                  <XCircle
-                                    size={80}
-                                    strokeWidth={1}
-                                    color="red"
-                                  />
-                                </AvatarFallback>
-                              </Avatar>
-                            ) : (
-                              <Camera
-                                className=" text-pink-500"
-                                size={80}
-                                strokeWidth={1}
-                              />
-                            )}
-                          </label>
+                        <label
+                          htmlFor="avatar-input"
+                          className="cursor-pointer flex justify-center items-center bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        >
+                          {avatar ? (
+                            <Avatar className="h-[80px] w-[80px]">
+                              <AvatarImage src={avatar} />
+                              <AvatarFallback className="bg-inherit">
+                                <XCircle
+                                  size={80}
+                                  strokeWidth={1}
+                                  color="red"
+                                />
+                              </AvatarFallback>
+                            </Avatar>
+                          ) : (
+                            <Camera
+                              className=" text-pink-500"
+                              size={80}
+                              strokeWidth={1}
+                            />
+                          )}
 
                           <Input
                             id="avatar-input"
@@ -298,7 +299,7 @@ const Register = () => {
                             }}
                             className="hidden"
                           />
-                        </div>
+                        </label>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
