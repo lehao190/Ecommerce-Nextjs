@@ -95,7 +95,6 @@ export const authOptions: NextAuthOptions = {
                 id
                 username
                 email
-                avatar
               }
             }
           }

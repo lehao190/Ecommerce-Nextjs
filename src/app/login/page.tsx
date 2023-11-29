@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -17,8 +17,7 @@ import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation'
-
-type Props = {};
+import { Loader2 } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z
@@ -34,8 +33,10 @@ const loginSchema = z.object({
   })
 });
 
-const Login = (props: Props) => {
+const Login = () => {
   const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -46,6 +47,8 @@ const Login = (props: Props) => {
   });
 
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
+    setLoading(true);
+    
     const response = await signIn('credentials', {
       redirect: false,
       email: values.email,
@@ -53,8 +56,10 @@ const Login = (props: Props) => {
     });
 
     if(response?.ok) {
+      setLoading(false);
       router.push('/');
     } else {
+      setLoading(false);
       console.error('Server error: ', response?.error);
       return;
     }
@@ -120,10 +125,13 @@ const Login = (props: Props) => {
                 </div>
 
                 <Button
+                  disabled={loading}
                   type="submit"
                   className="w-full text-white bg-primary hover:bg-pink-500 focus:ring-4 focus:ring-pink-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
-                  Login
+                  {
+                    loading ? <Loader2 size={30} className="mr-2 animate-spin" /> : 'Login'
+                  }
                 </Button>
 
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">

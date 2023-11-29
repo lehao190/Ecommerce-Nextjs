@@ -16,7 +16,20 @@ import {
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
-import { Camera, XCircle } from 'lucide-react';
+import { Camera, Loader2, XCircle } from 'lucide-react';
+import { gql } from 'graphql-request';
+import { initializeGraphqlClient } from '@/lib/graphql';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+
+type TRegisterResponse = {
+  register: {
+    id: number;
+    username: string;
+    email: string;
+    avatar?: string;
+  };
+};
 
 const ACCEPTED_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
 const ONE_MEGABYTE = 1 * 1024 * 1024;
@@ -56,6 +69,9 @@ const signUpSchema = z
   });
 
 const Register = () => {
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
 
   const form = useForm<z.infer<typeof signUpSchema>>({
@@ -68,8 +84,88 @@ const Register = () => {
     }
   });
 
-  const onSubmit = (values: z.infer<typeof signUpSchema>) => {
-    console.log(values);
+  const convertFileToBase64 = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        // Remove the data: prefix and the mime type from the result
+        const base64 = reader.result as string;
+        const base64WithoutPrefix = base64.split(',')[1];
+        resolve(base64WithoutPrefix);
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
+
+  const signUp = async (values: z.infer<typeof signUpSchema> ) => {
+    let base64Avatar: string | null = null;
+    
+    if (values.avatar) {
+      base64Avatar = await convertFileToBase64(values.avatar);
+    }
+
+    const signUpCredentials = gql`
+      mutation Register(
+        $username: String!
+        $email: String!
+        $password: String!
+        $avatar: String
+      ) {
+        register(
+          registerInput: {
+            username: $username
+            email: $email
+            password: $password
+            avatar: $avatar
+          }
+        ) {
+          id
+          username
+          email
+        }
+      }
+    `;
+
+    const { register: data } =
+      await initializeGraphqlClient().request<TRegisterResponse>(
+        signUpCredentials,
+        {
+          username: values.username,
+          email: values.email,
+          password: values.password,
+          avatar: base64Avatar
+        }
+      );
+  };
+
+  const onSubmit = async (values: z.infer<typeof signUpSchema>) => {
+    setLoading(true);
+
+    try {
+      await signUp(values);
+
+      const response = await signIn('credentials', {
+        redirect: false,
+        email: values.email,
+        password: values.password
+      });
+
+      if (response?.ok) {
+        setLoading(false);
+        router.push('/');
+      } else {
+        setLoading(false);
+        console.error('Server error: ', response?.error);
+        return;
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
+      return;
+    }
   };
 
   return (
@@ -209,10 +305,15 @@ const Register = () => {
                   )}
                 />
                 <Button
+                  disabled={loading}
                   type="submit"
                   className="w-full text-white bg-primary hover:bg-pink-500 focus:ring-4 focus:ring-pink-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
-                  Create an account
+                  {loading ? (
+                    <Loader2 size={30} className="mr-2 animate-spin" />
+                  ) : (
+                    'Create an account'
+                  )}
                 </Button>
 
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
