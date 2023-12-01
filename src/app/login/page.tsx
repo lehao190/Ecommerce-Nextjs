@@ -55,13 +55,18 @@ const Login = () => {
       password: values.password,
     });
 
-    if(response?.ok) {
+    if (response?.ok) {
       setLoading(false);
       router.push('/');
     } else {
       setLoading(false);
-      console.error('Server error: ', response?.error);
-      return;
+      const statusCode = Number(response?.error);
+
+      if (statusCode === 403) {
+        console.log('Status 403')
+      } else if (statusCode === 404) {
+        console.log('Status 404')
+      }
     }
   };
 

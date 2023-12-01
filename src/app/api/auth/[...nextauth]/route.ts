@@ -76,7 +76,10 @@ export const authOptions: NextAuthOptions = {
       };
 
       return session;
-    }
+    },
+    // signIn({ user, account, profile, email, credentials }) {
+    //   throw new Error('hey man')
+    // },
   },
   providers: [
     CredentialsProvider({
@@ -118,11 +121,7 @@ export const authOptions: NextAuthOptions = {
           };
         }
 
-        if(error) {
-          console.log('Graphql Error: ', error)
-        }     
-
-        return null;
+        throw new Error(String(error?.status));
       }
     })
   ]
