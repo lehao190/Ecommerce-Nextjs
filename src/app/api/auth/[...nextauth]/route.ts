@@ -77,9 +77,6 @@ export const authOptions: NextAuthOptions = {
 
       return session;
     },
-    // signIn({ user, account, profile, email, credentials }) {
-    //   throw new Error('hey man')
-    // },
   },
   providers: [
     CredentialsProvider({
@@ -108,8 +105,9 @@ export const authOptions: NextAuthOptions = {
         const [response, error] = await handleRequest<TLoginResponse>(loginCredentials, {
           email: credentials?.email,
           password: credentials?.password
-        })
+        });
 
+        // Successful authentication
         if (response?.login) {
           const { login: data } = response;
 
@@ -121,6 +119,7 @@ export const authOptions: NextAuthOptions = {
           };
         }
 
+        // Authentication error
         throw new Error(String(error?.status));
       }
     })

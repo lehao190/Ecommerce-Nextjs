@@ -21,6 +21,10 @@ import { gql } from 'graphql-request';
 import { initializeGraphqlClient } from '@/lib/graphql';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { convertFileToBase64 } from '@/utils/conversion/handle-base64';
+import { alertComponent } from '@/components/customs/callouts/alert';
+import { parse } from 'graphql';
+import { handleRequest } from '@/utils/handle-requests';
 
 type TRegisterResponse = {
   register: {
@@ -31,6 +35,12 @@ type TRegisterResponse = {
   };
 };
 
+const ALERT_MESSAGES = {
+  400: 'Bad request',
+  403: 'Wrong password. Try again.',
+  404: 'Email does not exist. Please provide the correct one.',
+  409: 'Email already exists. Please provide another one.'
+};
 const ACCEPTED_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
 const ONE_MEGABYTE = 1 * 1024 * 1024;
 
@@ -68,11 +78,13 @@ const signUpSchema = z
     path: ['confirmPassword'] // path of error
   });
 
+// Register component
 const Register = () => {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
@@ -84,30 +96,18 @@ const Register = () => {
     }
   });
 
-  const convertFileToBase64 = async (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        // Remove the data: prefix and the mime type from the result
-        const base64 = reader.result as string;
-        const base64WithoutPrefix = base64.split(',')[1];
-        resolve(base64WithoutPrefix);
-      };
-      reader.onerror = (error) => {
-        reject(error);
-      };
-    });
-  };
-
-  const signUp = async (values: z.infer<typeof signUpSchema>) => {
+  // Sign up user
+  const signUp = async (
+    values: z.infer<typeof signUpSchema>
+  ): Promise<boolean> => {
     let base64Avatar: string | null = null;
 
+    // Converting image file to base64 encoding if chosen
     if (values.avatar) {
       base64Avatar = await convertFileToBase64(values.avatar);
     }
 
-    const signUpCredentials = gql`
+    const signUpCredentials = parse(gql`
       mutation Register(
         $username: String!
         $email: String!
@@ -127,26 +127,32 @@ const Register = () => {
           email
         }
       }
-    `;
+    `);
 
-    const { register: data } =
-      await initializeGraphqlClient().request<TRegisterResponse>(
-        signUpCredentials,
-        {
-          username: values.username,
-          email: values.email,
-          password: values.password,
-          avatar: base64Avatar
-        }
-      );
+    const [_, error] = await handleRequest<TRegisterResponse>(
+      signUpCredentials,
+      {
+        username: values.username,
+        email: values.email,
+        password: values.password,
+        avatar: base64Avatar
+      }
+    );
+
+    if (error?.status === 409) {
+      setAlertMessage(ALERT_MESSAGES[409]);
+      return false;
+    }
+
+    return true;
   };
 
   const onSubmit = async (values: z.infer<typeof signUpSchema>) => {
     setLoading(true);
 
-    try {
-      await signUp(values);
+    const isSignUpSuccess = await signUp(values);
 
+    if (isSignUpSuccess) {
       const response = await signIn('credentials', {
         redirect: false,
         email: values.email,
@@ -158,14 +164,17 @@ const Register = () => {
         router.push('/');
       } else {
         setLoading(false);
-        console.error('Server error: ', response?.error);
-        return;
+        const statusCode = Number(response?.error);
+
+        if (statusCode === 403) {
+          setAlertMessage(ALERT_MESSAGES[403]);
+        } else if (statusCode === 404) {
+          setAlertMessage(ALERT_MESSAGES[404]);
+        }
       }
-    } catch (error) {
-      setLoading(false);
-      console.error(error);
-      return;
     }
+
+    setLoading(false);
   };
 
   return (
@@ -176,6 +185,9 @@ const Register = () => {
             <h1 className="text-xl font-bold leading-tight tracking-tighter md:text-2xl">
               Create an account
             </h1>
+
+            {alertMessage ? alertComponent(alertMessage) : null}
+
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
