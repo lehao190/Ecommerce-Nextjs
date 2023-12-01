@@ -3,6 +3,8 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { gql } from 'graphql-request';
 import { TUser } from '@/types/user.types';
 import { initializeGraphqlClient } from '@/lib/graphql';
+import { handleRequest } from '@/utils/handle-requests';
+import { parse } from 'graphql';
 
 // Login response from Graphql Server
 type TLoginResponse = {
@@ -85,7 +87,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
-        const loginCredentials = gql`
+        const loginCredentials = parse(gql`
           mutation Login($email: String!, $password: String!) {
             login(loginInput: { email: $email, password: $password }) {
               access_token
@@ -98,18 +100,16 @@ export const authOptions: NextAuthOptions = {
               }
             }
           }
-        `;
+        `);
 
-        const { login: data } =
-          await initializeGraphqlClient().request<TLoginResponse>(
-            loginCredentials,
-            {
-              email: credentials?.email,
-              password: credentials?.password
-            }
-          );
+        const [response, error] = await handleRequest<TLoginResponse>(loginCredentials, {
+          email: credentials?.email,
+          password: credentials?.password
+        })
 
-        if (data) {
+        if (response?.login) {
+          const { login: data } = response;
+
           return {
             accessToken: data.access_token,
             refreshToken: data.refresh_token,
@@ -117,6 +117,10 @@ export const authOptions: NextAuthOptions = {
             expires_at: data.expires_at
           };
         }
+
+        if(error) {
+          console.log('Graphql Error: ', error)
+        }     
 
         return null;
       }
