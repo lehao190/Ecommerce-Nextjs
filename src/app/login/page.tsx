@@ -4,26 +4,18 @@ import React, { useState } from 'react';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
-import { alertComponent } from '@/components/customs/callouts/alert';
+import { AlertComponent } from '@/components/customs/callouts/Alert';
+import FormComponent from '@/components/customs/forms/Form';
 
 const ALERT_MESSAGES = {
   403: 'Wrong password. Try again.',
   404: 'Email does not exist. Please provide the correct one.'
-}
+};
 
 const loginSchema = z.object({
   email: z
@@ -35,9 +27,12 @@ const loginSchema = z.object({
       message: 'Email is not valid!'
     }),
   password: z.string().min(8, {
-    message: 'Email must be at leaset 8 characters.'
+    message: 'Password must be at leaset 8 characters.'
   })
 });
+
+// Login form's fields
+type TLoginFields = z.infer<typeof loginSchema>;
 
 // Login Component
 const Login = () => {
@@ -46,7 +41,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
-  const form = useForm<z.infer<typeof loginSchema>>({
+  const form = useForm<TLoginFields>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
@@ -55,7 +50,7 @@ const Login = () => {
   });
 
   // Sign in
-  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
+  const onSubmit = async (values: TLoginFields) => {
     setLoading(true);
 
     const response = await signIn('credentials', {
@@ -88,49 +83,14 @@ const Login = () => {
               Login
             </h1>
 
-            { alertMessage ? alertComponent(alertMessage) : null}
+            {alertMessage ? AlertComponent(alertMessage) : null}
 
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4 md:space-y-6"
+            {
+              <FormComponent<TLoginFields>
+                fieldNames={['email', 'password']}
+                form={form}
+                onSubmit={onSubmit}
               >
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                          placeholder="name@company.com"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                          placeholder="••••••••"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <div className="flex justify-end">
                   <Link
                     href="/login#"
@@ -162,8 +122,8 @@ const Login = () => {
                     Sign up
                   </Link>
                 </p>
-              </form>
-            </Form>
+              </FormComponent>
+            }
           </div>
         </div>
       </div>
