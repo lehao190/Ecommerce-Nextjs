@@ -85,8 +85,9 @@ const Shop = (props: Props) => {
           <div className="space-y-2">
             <h2 className="text-lg font-semibold text-gray-700">Categories</h2>
 
-            {checkboxes.map((checkbox) => (
+            {checkboxes.map((checkbox, index) => (
               <FilterCheckbox
+                key={index}
                 checked={checkbox.checked}
                 text={checkbox.text}
                 value={checkbox.value}
@@ -99,8 +100,9 @@ const Shop = (props: Props) => {
           <div className="checkboxes space-y-2">
             <h2 className="text-lg font-semibold text-gray-700">Categories</h2>
 
-            {checkboxes.map((checkbox) => (
+            {checkboxes.map((checkbox, index) => (
               <FilterCheckbox
+                key={index}
                 checked={checkbox.checked}
                 text={checkbox.text}
                 value={checkbox.value}
