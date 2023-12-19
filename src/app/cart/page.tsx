@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Trash2, Minus, Plus } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 // A mock data for the items in the cart
@@ -185,10 +185,12 @@ const CartPage = () => {
           </div>
         </div>
 
+        {/* Appears on medium > */}
         <div className="hidden md:flex items-center mt-4 md:mt-0 font-semibold">
           ${item.price}
         </div>
 
+        {/* Appears on medium > */}
         <button
           onClick={() => onRemove(item.id)}
           className="hidden md:flex items-center mt-4 md:mt-0 text-red-500 hover:text-red-700"
