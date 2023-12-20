@@ -1,3 +1,4 @@
+import CreateProduct from '@/components/customs/account/product/CreateProduct';
 import AccountSidebar from '@/components/customs/sidebars/AccountSidebar';
 import React from 'react';
 
@@ -8,13 +9,12 @@ const MyAccount = (props: Props) => {
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-10">My Profile</h1>
 
-      <div className="flex">
+      <div className="flex gap-8">
         <AccountSidebar />
 
         {/* Main content */}
-        <div className="">
-          {/* Put your main content here */}
-          Main Content
+        <div className="grow max-w-[650px]">
+          <CreateProduct />
         </div>
       </div>
     </div>
