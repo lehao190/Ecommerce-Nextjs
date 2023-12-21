@@ -8,21 +8,28 @@ import {
   Contact
 } from 'lucide-react';
 
-// Define the menu items as an array of objects
+export type TAccountTabItem = 'EDIT_USER' | 'PRODUCTS' | 'ORDERS';
+
+const TABS: TAccountTabItem[] = ['EDIT_USER', 'PRODUCTS', 'ORDERS'];
+
 const menuItems = [
   {
     name: 'Personal Information',
-    path: '/',
+    tab: TABS[0],
     icon: <Contact size={22} />
   },
-  { name: 'Products', path: '/', icon: <Store size={22} /> },
-  { name: 'My Orders', path: '/', icon: <Package size={22} /> },
-  { name: 'Logout', path: '/', icon: <DoorClosed size={22} /> }
+  { name: 'Products', tab: TABS[1], icon: <Store size={22} /> },
+  { name: 'My Orders', tab: TABS[2], icon: <Package size={22} /> },
+  { name: 'Logout', icon: <DoorClosed size={22} /> }
 ];
 
+// Sidebar props
+type Props = {
+  setCurrentTab: React.Dispatch<React.SetStateAction<TAccountTabItem>>;
+};
+
 // Define the Sidebar component
-const AccountSidebar = () => {
-  // Return the JSX for the sidebar
+const AccountSidebar = ({ setCurrentTab }: Props) => {
   return (
     <Card>
       <CardHeader>
@@ -43,7 +50,11 @@ const AccountSidebar = () => {
       <CardContent>
         <ul>
           {menuItems.map((item, index) => (
-            <li key={index} className="mt-4 hover:text-pink-500 cursor-pointer">
+            <li
+              key={index}
+              onClick={() => setCurrentTab(item.tab ? item.tab : 'EDIT_USER')}
+              className="mt-4 hover:text-pink-500 cursor-pointer"
+            >
               <div className="flex items-center">
                 {item.icon}
 
@@ -59,5 +70,4 @@ const AccountSidebar = () => {
   );
 };
 
-// Export the Sidebar component
 export default AccountSidebar;
