@@ -190,7 +190,24 @@ const Register = () => {
             {alertMessage ? AlertComponent(alertMessage) : null}
 
             <FormComponent<Omit<TSignUpFields, 'avatar'>>
-              fieldNames={['username', 'email', 'password', 'confirmPassword']}
+              fieldNames={[
+                {
+                  field: 'username',
+                  type: 'text',
+                },
+                {
+                  field: 'email',
+                  type: 'text',
+                },
+                {
+                  field: 'password',
+                  type: 'password',
+                },
+                {
+                  field: 'confirmPassword',
+                  type: 'password',
+                },
+              ]}
               form={form}
               onSubmit={onSubmit}
             >
@@ -203,7 +220,7 @@ const Register = () => {
                     <FormControl>
                       <label
                         htmlFor="avatar-input"
-                        className="cursor-pointer flex justify-center items-center bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        className="cursor-pointer flex justify-center items-center border border-gray-300 text-gray-900 sm:text-sm rounded-lg w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       >
                         {avatar ? (
                           <Avatar className="h-[80px] w-[80px]">

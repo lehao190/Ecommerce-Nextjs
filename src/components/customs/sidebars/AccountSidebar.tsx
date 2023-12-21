@@ -42,8 +42,8 @@ const AccountSidebar = () => {
 
       <CardContent>
         <ul>
-          {menuItems.map((item) => (
-            <li className="mt-4 hover:text-gray-500 cursor-pointer">
+          {menuItems.map((item, index) => (
+            <li key={index} className="mt-4 hover:text-gray-500 cursor-pointer">
               <div className="flex items-center">
                 {item.icon}
 

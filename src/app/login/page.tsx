@@ -87,7 +87,16 @@ const Login = () => {
 
             {
               <FormComponent<TLoginFields>
-                fieldNames={['email', 'password']}
+                fieldNames={[
+                  {
+                    field: 'email',
+                    type: 'text'
+                  },
+                  {
+                    field: 'password',
+                    type: 'password'
+                  }
+                ]}
                 form={form}
                 onSubmit={onSubmit}
               >

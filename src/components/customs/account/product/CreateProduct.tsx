@@ -22,7 +22,6 @@ import { AlertComponent } from '@/components/customs/callouts/Alert';
 import { parse } from 'graphql';
 import { handleRequest } from '@/utils/handle-requests';
 import FormComponent from '@/components/customs/forms/Form';
-import { Textarea } from "@/components/ui/textarea"
 
 // Sign up response type
 type TCreateProductResponse = {
@@ -54,8 +53,8 @@ const createProductSchema = z
       .min(20, {
         message: 'Desciption must be at leaset 20 characters.'
       }),
-    quantity: z.number().positive(),
-    avatar: z
+    quantity: z.coerce.number().positive(),
+    image: z
       .custom<File>()
       .refine((file) => file.size < ONE_MEGABYTE, {
         message: 'The file must be below 1 MB.'
@@ -74,7 +73,7 @@ const CreateProduct = () => {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
-  const [avatar, setAvatar] = useState<string | undefined>(undefined);
+  const [image, setImage] = useState<string | undefined>(undefined);
   const [alertMessage, setAlertMessage] = useState('');
 
   const form = useForm<TProductFields>({
@@ -90,8 +89,8 @@ const CreateProduct = () => {
   //   let base64Avatar: string | null = null;
 
   //   // Converting image file to base64 encoding if chosen
-  //   if (values.avatar) {
-  //     base64Avatar = await convertFileToBase64(values.avatar);
+  //   if (values.image) {
+  //     base64Avatar = await convertFileToBase64(values.image);
   //   }
 
   //   const signUpCredentials = parse(gql`
@@ -99,14 +98,14 @@ const CreateProduct = () => {
   //       $username: String!
   //       $email: String!
   //       $password: String!
-  //       $avatar: String
+  //       $image: String
   //     ) {
   //       register(
   //         registerInput: {
   //           username: $username
   //           email: $email
   //           password: $password
-  //           avatar: $avatar
+  //           image: $image
   //         }
   //       ) {
   //         id
@@ -122,7 +121,7 @@ const CreateProduct = () => {
   //       username: values.username,
   //       email: values.email,
   //       password: values.password,
-  //       avatar: base64Avatar
+  //       image: base64Avatar
   //     }
   //   );
 
@@ -135,6 +134,8 @@ const CreateProduct = () => {
   // };
 
   const onSubmit = async (values: z.infer<typeof createProductSchema>) => {
+    console.log('Submit: ', values);
+
     // setLoading(true);
 
     // const isSignUpSuccess = await signUp(values);
@@ -172,27 +173,38 @@ const CreateProduct = () => {
 
       {alertMessage ? AlertComponent(alertMessage) : null}
 
-      {/* <Textarea placeholder="Type your message here." /> */}
-
-      <FormComponent<Omit<TProductFields, 'avatar'>>
-        fieldNames={['name', 'description']}
+      <FormComponent<Omit<TProductFields, 'image'>>
+        fieldNames={[
+          {
+            field: 'name',
+            type: 'text',
+          },
+          {
+            field: 'description',
+            type: 'textarea',
+          },
+          {
+            field: 'quantity',
+            type: 'number',
+          },
+        ]}
         form={form}
         onSubmit={onSubmit}
       >
         <FormField
           control={form.control}
-          name="avatar"
+          name="image"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Upload file</FormLabel>
               <FormControl>
                 <label
-                  htmlFor="avatar-input"
-                  className="cursor-pointer flex justify-center items-center bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  htmlFor="image-input"
+                  className="cursor-pointer flex justify-center items-center border border-gray-300 text-gray-900 sm:text-sm rounded-lg w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
-                  {avatar ? (
+                  {image ? (
                     <Avatar className="h-[80px] w-[80px]">
-                      <AvatarImage src={avatar} />
+                      <AvatarImage src={image} />
                       <AvatarFallback className="bg-inherit">
                         <XCircle size={80} strokeWidth={1} color="red" />
                       </AvatarFallback>
@@ -206,15 +218,15 @@ const CreateProduct = () => {
                   )}
 
                   <Input
-                    id="avatar-input"
+                    id="image-input"
                     type="file"
                     onChange={(e) => {
                       field.onChange(e.target.files ? e.target.files[0] : null);
 
                       if (e.target.files?.length) {
-                        setAvatar(URL.createObjectURL(e.target.files[0]));
+                        setImage(URL.createObjectURL(e.target.files[0]));
                       } else {
-                        setAvatar(undefined);
+                        setImage(undefined);
                       }
                     }}
                     className="hidden"
