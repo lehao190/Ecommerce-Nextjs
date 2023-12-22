@@ -2,6 +2,7 @@
 
 import CreateProduct from '@/components/customs/account/product/CreateProduct';
 import EditUser from '@/components/customs/account/user/EditUser';
+import OrderTable from '@/components/customs/account/order/OrderTable';
 import AccountSidebar, {
   TAccountTabItem
 } from '@/components/customs/sidebars/AccountSidebar';
@@ -12,7 +13,7 @@ type TTabComponent = Record<TAccountTabItem, JSX.Element>;
 const componentTab: TTabComponent = {
   EDIT_USER: <EditUser />,
   PRODUCTS: <CreateProduct />,
-  ORDERS: <div>Orders</div>
+  ORDERS: <OrderTable />
 };
 
 // Render component
