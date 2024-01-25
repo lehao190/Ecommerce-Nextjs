@@ -28,8 +28,10 @@ const navigations = [
 
 function Header() {
   return (
-    <div className="flex items-center justify-between bg-gray-50 p-4">
-      <div className="text-primary text-2xl font-bold">Ecommerce</div>
+    <div className="flex items-center justify-between p-4">
+      <div className="text-primary text-2xl font-bold">
+        <Link href="/">Ecommerce</Link>
+      </div>
       <div className="flex space-x-3">
         {navigations.map((navigation, index) => (
           <Link
@@ -51,7 +53,7 @@ function Header() {
           </span>
         </Button>
 
-        <HeaderSheet navigations={navigations}/>
+        <HeaderSheet navigations={navigations} />
       </div>
     </div>
   );

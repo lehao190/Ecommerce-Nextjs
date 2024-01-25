@@ -26,10 +26,11 @@ const menuItems = [
 // Sidebar props
 type Props = {
   setCurrentTab: React.Dispatch<React.SetStateAction<TAccountTabItem>>;
+  currentTab: TAccountTabItem;
 };
 
 // Define the Sidebar component
-const AccountSidebar = ({ setCurrentTab }: Props) => {
+const AccountSidebar = ({ setCurrentTab, currentTab }: Props) => {
   return (
     <Card>
       <CardHeader>
@@ -53,7 +54,7 @@ const AccountSidebar = ({ setCurrentTab }: Props) => {
             <li
               key={index}
               onClick={() => setCurrentTab(item.tab ? item.tab : 'EDIT_USER')}
-              className="mt-4 hover:text-pink-500 cursor-pointer"
+              className={`mt-4 hover:text-pink-500 cursor-pointer ${currentTab === item.tab ? 'text-primary' : 'text-black'}`}
             >
               <div className="flex items-center">
                 {item.icon}

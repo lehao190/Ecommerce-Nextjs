@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import Image from 'next/image';
 
 // A mock data for the items in the cart
 const items = [
@@ -150,9 +151,17 @@ const CartPage = () => {
     return (
       <div className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-white border-b">
         <div className="flex items-center w-full md:w-1/2">
-          <img
+          {/* <img
             src={item.image}
             alt={item.name}
+            className="w-16 h-16 object-cover mr-4"
+          /> */}
+
+          <Image
+            src={item.image}
+            alt={item.name}
+            width={128}
+            height={128}
             className="w-16 h-16 object-cover mr-4"
           />
           <div>
@@ -243,12 +252,12 @@ const CartPage = () => {
       <h1 className="text-3xl font-bold mb-4">Your Cart</h1>
       <div className="grid lg:grid-cols-12 sm:grid-cols-6 gap-8">
         <div className="lg:col-span-8 sm:col-span-6">
-          <div className="hidden md:flex items-center justify-between p-4 border-b font-bold">
+          {/* <div className="hidden md:flex items-center justify-between p-4 border-b font-bold">
             <div className="w-1/2">Items</div>
             <div className="">Quantity</div>
             <div className="">Subtotal</div>
             <div className="">Remove</div>
-          </div>
+          </div> */}
           {cartItems.length > 0 ? (
             cartItems.map((item) => (
               <CartItem key={item.id} item={item} onRemove={handleRemove} />

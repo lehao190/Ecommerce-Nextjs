@@ -57,6 +57,8 @@ const Product = ({ params }: Props) => {
             }
             alt="Product image"
             fill
+            sizes="(max-width: 768px) 30vw, 33vw"
+            priority
           />
         </div>
 

@@ -6,10 +6,10 @@ type Props = {
   value: string;
 };
 
-const FilterCheckbox = ({ checked, text, value }: Props) => {
+const CustomCheckbox = ({ text, value }: Props) => {
   return (
-    <div className="flex items-center space-x-2">
-      <Checkbox id={value} checked={checked} className="mb-2" />
+    <div className="flex space-x-2">
+      <Checkbox id={value} value={value} className="mb-2" />
 
       <label
         htmlFor={value}
@@ -21,4 +21,4 @@ const FilterCheckbox = ({ checked, text, value }: Props) => {
   );
 };
 
-export default FilterCheckbox;
+export default CustomCheckbox;

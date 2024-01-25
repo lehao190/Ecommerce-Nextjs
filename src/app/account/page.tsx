@@ -32,7 +32,7 @@ const MyAccount = () => {
 
       <div className="md:flex gap-8">
         <div className="grow max-w-[300px] h-[300px]">
-          <AccountSidebar setCurrentTab={setCurrentTab} />
+          <AccountSidebar setCurrentTab={setCurrentTab} currentTab={currentTab} />
         </div>
 
         {/* Main content */}

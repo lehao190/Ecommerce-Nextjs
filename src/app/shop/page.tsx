@@ -1,4 +1,5 @@
-import FilterCheckbox from '@/components/customs/inputs/FilterCheckbox';
+import CustomCheckbox from '@/components/customs/inputs/CustomCheckbox';
+import CustomRadioGroup from '@/components/customs/inputs/CustomRadioGroup';
 import ProductItem from '@/components/customs/product/ProductItem';
 import { Separator } from '@/components/ui/separator';
 
@@ -50,7 +51,55 @@ const products = [
     starRating: 3,
     image:
       'https://raw.githubusercontent.com/adrianhajdin/ecommerce/main/public/admin%20ui/products/13-inch-macbokk-air-256gb-space-gray.png'
-  }
+  },
+  {
+    id: 7,
+    name: 'Apple Max Pro Plus+',
+    price: 1023,
+    starRating: 3,
+    image:
+      'https://raw.githubusercontent.com/adrianhajdin/ecommerce/main/public/admin%20ui/products/13-inch-macbokk-air-256gb-space-gray.png'
+  },
+  {
+    id: 8,
+    name: 'Apple Max Pro Plus+',
+    price: 1023,
+    starRating: 3,
+    image:
+      'https://raw.githubusercontent.com/adrianhajdin/ecommerce/main/public/admin%20ui/products/13-inch-macbokk-air-256gb-space-gray.png'
+  },
+  {
+    id: 9,
+    name: 'Apple Max Pro Plus+',
+    price: 1023,
+    starRating: 3,
+    image:
+      'https://raw.githubusercontent.com/adrianhajdin/ecommerce/main/public/admin%20ui/products/13-inch-macbokk-air-256gb-space-gray.png'
+  },
+  {
+    id: 10,
+    name: 'Apple Max Pro Plus+',
+    price: 1023,
+    starRating: 3,
+    image:
+      'https://raw.githubusercontent.com/adrianhajdin/ecommerce/main/public/admin%20ui/products/13-inch-macbokk-air-256gb-space-gray.png'
+  },
+  {
+    id: 11,
+    name: 'Apple Max Pro Plus+',
+    price: 1023,
+    starRating: 3,
+    image:
+      'https://raw.githubusercontent.com/adrianhajdin/ecommerce/main/public/admin%20ui/products/13-inch-macbokk-air-256gb-space-gray.png'
+  },
+  {
+    id: 12,
+    name: 'Apple Max Pro Plus+',
+    price: 1023,
+    starRating: 3,
+    image:
+      'https://raw.githubusercontent.com/adrianhajdin/ecommerce/main/public/admin%20ui/products/13-inch-macbokk-air-256gb-space-gray.png'
+  },
 ];
 
 const checkboxes = [
@@ -76,17 +125,37 @@ const checkboxes = [
   }
 ] as const;
 
+const radioGroupItems = [
+  {
+    text: 'All',
+    value: 'all',
+  },
+  {
+    text: '< $200',
+    value: 'SECOND_OPTION',
+  },
+  {
+    text: '$200 ~ $1000',
+    value: 'THIRD_OPTION',
+  },
+  {
+    text: '> $1000',
+    value: 'FOURTH_OPTION',
+  },
+];
+
 const Shop = (props: Props) => {
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold text-primary mb-4">Our Products</h1>
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-10 text-primary">Our Products</h1>
       <div className="flex flex-col lg:flex-row">
-        <div className="lg:w-64 lg:pr-12 pr-0 w-full">
+        {/* Filters section */}
+        <section className="lg:w-64 lg:pr-12 pr-0 w-full mb-12">
           <div className="space-y-2">
             <h2 className="text-lg font-semibold text-gray-700">Categories</h2>
 
             {checkboxes.map((checkbox, index) => (
-              <FilterCheckbox
+              <CustomCheckbox
                 key={index}
                 checked={checkbox.checked}
                 text={checkbox.text}
@@ -98,30 +167,25 @@ const Shop = (props: Props) => {
           <Separator className="my-4" />
 
           <div className="checkboxes space-y-2">
-            <h2 className="text-lg font-semibold text-gray-700">Categories</h2>
+            <h2 className="text-lg font-semibold text-gray-700">Prices</h2>
 
-            {checkboxes.map((checkbox, index) => (
-              <FilterCheckbox
-                key={index}
-                checked={checkbox.checked}
-                text={checkbox.text}
-                value={checkbox.value}
-              />
-            ))}
+            {<CustomRadioGroup defaultValue={radioGroupItems[0].value} radioGroupItems={radioGroupItems} />}
           </div>
-        </div>
+        </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Product items section */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {products.map((product, index) => (
             <ProductItem
               key={index}
+              id={product.id}
               name={product.name}
               price={product.price}
               image={product.image}
               starRating={product.starRating}
             />
           ))}
-        </div>
+        </section>
       </div>
     </div>
   );
