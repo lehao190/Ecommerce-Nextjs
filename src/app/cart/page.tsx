@@ -1,12 +1,20 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Trash2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import Image from 'next/image';
+import CartItem from '@/components/customs/cart/CartItem';
+
+// Cart items type
+export type TCartItem = {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+};
 
 // A mock data for the items in the cart
-const items = [
+const items: TCartItem[] = [
   {
     id: 1,
     name: 'iPhone 13',
@@ -39,211 +47,39 @@ const CartPage = () => {
   const [cartItems, setCartItems] = useState(items);
 
   // A function for removing an item from the cart by id
-  const handleRemove = (id: any) => {
+  const handleRemove = (id: number) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
   // A function for calculating the total price of the items in the cart
   const getTotalPrice = () => {
-    return cartItems.reduce((total, item) => total + item.price, 0);
+    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
   // A function for decreasing the quantity of an item by id
-  const onDecrease = (id: any) => {
+  const onDecrease = (id: number) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+        item.id === id ? { ...item, quantity: item.quantity > 0 ? --item.quantity : 0 } : item
       )
     );
   };
 
-  // A function for increasing the quantity of an item by id
-  const onIncrease = (id: any) => {
+  // // A function for increasing the quantity of an item by id
+  const onIncrease = (id: number) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+        item.id === id ? { ...item, quantity: ++item.quantity } : item
       )
     );
   };
 
   // A function for changing the quantity of an item by id and value
-  const onQuantityChange = (id: any, value: any) => {
+  const onQuantityChange = (id: number, quantity: number) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: value } : item
+        item.id === id ? { ...item, quantity: quantity < 0 ? 0 : quantity } : item
       )
-    );
-  };
-
-  // A custom component for rendering each item in the cart
-  // const CartItem = ({ item, onRemove }: any) => {
-  //   return (
-  //     <div className="flex items-center justify-between p-4 bg-white border-b">
-  //       <div className="flex items-center w-1/2">
-  //         <img
-  //           src={item.image}
-  //           alt={item.name}
-  //           className="w-16 h-16 object-cover mr-4"
-  //         />
-  //         <div>
-  //           <h3 className="text-lg font-semibold">{item.name}</h3>
-  //           <p className="text-gray-500">${item.price}</p>
-  //         </div>
-
-  //         <div className="border border-gray-600 rounded-lg">
-  //           <button
-  //             onClick={() => onDecrease(item.id)}
-  //             className="text-gray-600 h-[20px] font-bold px-1 py-1 m-1 rounded inline-flex items-center"
-  //           >
-  //             -
-  //           </button>
-  //           <input
-  //             type="text"
-  //             value={0}
-  //             onChange={(e) => onQuantityChange(item.id, e.target.value)}
-  //             className="w-12 text-center"
-  //           />
-  //           <button
-  //             onClick={() => onIncrease(item.id)}
-  //             className=" text-gray-600 h-[20px] font-bold px-1 py-1 m-1 rounded inline-flex items-center"
-  //           >
-  //             +
-  //           </button>
-  //         </div>
-  //       </div>
-
-  //       <div className="hidden md:flex items-center">
-  //         <div className="border border-gray-600 rounded-lg">
-  //           <button
-  //             onClick={() => onDecrease(item.id)}
-  //             className="text-gray-600 h-[20px] font-bold px-1 py-1 m-1 rounded inline-flex items-center"
-  //           >
-  //             -
-  //           </button>
-  //           <input
-  //             type="text"
-  //             value={0}
-  //             onChange={(e) => onQuantityChange(item.id, e.target.value)}
-  //             className="w-12 text-center"
-  //           />
-  //           <button
-  //             onClick={() => onIncrease(item.id)}
-  //             className=" text-gray-600 h-[20px] font-bold px-1 py-1 m-1 rounded inline-flex items-center"
-  //           >
-  //             +
-  //           </button>
-  //         </div>
-  //       </div>
-
-  //       <div className="hidden md:flex items-center font-semibold">${item.price}</div>
-
-  //       <button
-  //         onClick={() => onRemove(item.id)}
-  //         className="hidden md:flex items-center text-red-500 hover:text-red-700"
-  //       >
-  //         <Trash2 size={20} />
-  //       </button>
-  //     </div>
-  //   );
-  // };
-
-  const CartItem = ({ item, onRemove }: any) => {
-    return (
-      <div className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-white border-b">
-        <div className="flex items-center w-full md:w-1/2">
-          {/* <img
-            src={item.image}
-            alt={item.name}
-            className="w-16 h-16 object-cover mr-4"
-          /> */}
-
-          <Image
-            src={item.image}
-            alt={item.name}
-            width={128}
-            height={128}
-            className="w-16 h-16 object-cover mr-4"
-          />
-          <div>
-            <h3 className="text-lg font-semibold">{item.name}</h3>
-            <p className="text-gray-500">${item.price}</p>
-          </div>
-        </div>
-
-        {/* Appears on medium > */}
-        <div className="hidden md:flex items-center mt-4 md:mt-0">
-          <div className="border border-gray-600 rounded-lg">
-            <button
-              onClick={() => onDecrease(item.id)}
-              className="text-gray-600 h-[20px] font-bold px-1 py-1 m-1 rounded inline-flex items-center"
-            >
-              -
-            </button>
-            <input
-              type="text"
-              value={0}
-              onChange={(e) => onQuantityChange(item.id, e.target.value)}
-              className="w-12 text-center"
-            />
-            <button
-              onClick={() => onIncrease(item.id)}
-              className=" text-gray-600 h-[20px] font-bold px-1 py-1 m-1 rounded inline-flex items-center"
-            >
-              +
-            </button>
-          </div>
-        </div>
-
-        {/* Appears on medium > */}
-        <div className="hidden md:flex items-center mt-4 md:mt-0 font-semibold">
-          ${item.price}
-        </div>
-
-        {/* Appears on medium > */}
-        <button
-          onClick={() => onRemove(item.id)}
-          className="hidden md:flex items-center mt-4 md:mt-0 text-red-500 hover:text-red-700"
-        >
-          <Trash2 size={20} />
-        </button>
-
-        {/* Hidden on medium screen > */}
-        <div className="md:hidden flex justify-between">
-          <div className="flex items-center mt-4 md:mt-0">
-            <div className="border border-gray-600 rounded-lg">
-              <button
-                onClick={() => onDecrease(item.id)}
-                className="text-gray-600 h-[20px] font-bold px-1 py-1 m-1 rounded inline-flex items-center"
-              >
-                -
-              </button>
-              <input
-                type="text"
-                value={0}
-                onChange={(e) => onQuantityChange(item.id, e.target.value)}
-                className="w-12 text-center"
-              />
-              <button
-                onClick={() => onIncrease(item.id)}
-                className=" text-gray-600 h-[20px] font-bold px-1 py-1 m-1 rounded inline-flex items-center"
-              >
-                +
-              </button>
-            </div>
-          </div>
-
-          <div className="flex items-center mt-4 md:mt-0 font-semibold">
-            ${item.price}
-          </div>
-
-          <button
-            onClick={() => onRemove(item.id)}
-            className="flex items-center mt-4 md:mt-0 text-red-500 hover:text-red-700"
-          >
-            <Trash2 size={20} />
-          </button>
-        </div>
-      </div>
     );
   };
 
@@ -252,15 +88,16 @@ const CartPage = () => {
       <h1 className="text-3xl font-bold mb-4">Your Cart</h1>
       <div className="grid lg:grid-cols-12 sm:grid-cols-6 gap-8">
         <div className="lg:col-span-8 sm:col-span-6">
-          {/* <div className="hidden md:flex items-center justify-between p-4 border-b font-bold">
-            <div className="w-1/2">Items</div>
-            <div className="">Quantity</div>
-            <div className="">Subtotal</div>
-            <div className="">Remove</div>
-          </div> */}
           {cartItems.length > 0 ? (
             cartItems.map((item) => (
-              <CartItem key={item.id} item={item} onRemove={handleRemove} />
+              <CartItem
+                key={item.id}
+                item={item}
+                onRemove={handleRemove}
+                onDecrease={onDecrease}
+                onIncrease={onIncrease}
+                onQuantityChange={onQuantityChange}
+              />
             ))
           ) : (
             <p className="text-center text-gray-400">Your cart is empty.</p>

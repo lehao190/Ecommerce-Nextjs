@@ -1,5 +1,4 @@
 import { ShoppingBag } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import HeaderSheet from './HeaderSheet';
 
@@ -32,6 +31,7 @@ function Header() {
       <div className="text-primary text-2xl font-bold">
         <Link href="/">Ecommerce</Link>
       </div>
+      
       <div className="flex space-x-3">
         {navigations.map((navigation, index) => (
           <Link
@@ -46,12 +46,13 @@ function Header() {
             {navigation.text}
           </Link>
         ))}
-        <Button className="py-2 px-4 bg-inherit relative">
+
+        <Link href={'/cart'} className="py-2 px-4 bg-inherit relative">
           <ShoppingBag className="text-gray-500" size={26} />
           <span className="absolute top-0 right-0 text-[10px] bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center">
             1
           </span>
-        </Button>
+        </Link>
 
         <HeaderSheet navigations={navigations} />
       </div>
