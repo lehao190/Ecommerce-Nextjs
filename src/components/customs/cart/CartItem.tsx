@@ -2,17 +2,22 @@
 
 import { Trash2 } from 'lucide-react';
 import Image from 'next/image';
-import { TCartItem } from '@/app/cart/page';
+import { useDispatch } from 'react-redux';
+import {
+  cartItemQuantChange,
+  removeCartItem
+} from '@/lib/redux/features/cart/cartSlice';
+import { useRef } from 'react';
+import { TCartItem } from '@/types/cart.types';
 
 type Props = {
   item: TCartItem;
-  onRemove: (id: number) => void;
-  onDecrease: (id: number) => void;
-  onIncrease: (id: number) => void;
-  onQuantityChange: (id: number, quantity: number) => void;
 };
 
-const CartItem = ({ item, onRemove, onDecrease, onIncrease, onQuantityChange }: Props) => {
+const CartItem = ({ item }: Props) => {
+  const quantityInputRef = useRef<HTMLInputElement>(null);
+  const dispatch = useDispatch();
+
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-white border-b">
       <div className="flex items-center w-full md:w-1/2">
@@ -33,19 +38,46 @@ const CartItem = ({ item, onRemove, onDecrease, onIncrease, onQuantityChange }: 
       <div className="hidden md:flex items-center mt-4 md:mt-0">
         <div className="border border-gray-600 rounded-lg">
           <button
-            onClick={() => onDecrease(item.id)}
+            onClick={() => {
+              if (quantityInputRef.current?.value)
+                dispatch(
+                  cartItemQuantChange({
+                    id: item.id,
+                    quantity:
+                      +quantityInputRef.current.value > 0
+                        ? +quantityInputRef.current.value - 1
+                        : 0
+                  })
+                );
+            }}
             className="text-gray-600 h-[20px] font-bold px-1 py-1 m-1 rounded inline-flex items-center"
           >
             -
           </button>
           <input
             type="number"
+            ref={quantityInputRef}
             value={item.quantity}
-            onChange={e => onQuantityChange(item.id, +e.target.value)}
+            onChange={(e) =>
+              dispatch(
+                cartItemQuantChange({
+                  id: item.id,
+                  quantity: +e.target.value < 0 ? 0 : +e.target.value
+                })
+              )
+            }
             className="w-12 text-center"
           />
           <button
-            onClick={() => onIncrease(item.id)}
+            onClick={() => {
+              if (quantityInputRef.current?.value)
+                dispatch(
+                  cartItemQuantChange({
+                    id: item.id,
+                    quantity: +quantityInputRef.current.value + 1
+                  })
+                );
+            }}
             className=" text-gray-600 h-[20px] font-bold px-1 py-1 m-1 rounded inline-flex items-center"
           >
             +
@@ -60,7 +92,7 @@ const CartItem = ({ item, onRemove, onDecrease, onIncrease, onQuantityChange }: 
 
       {/* Appears on medium > */}
       <button
-        onClick={() => onRemove(item.id)}
+        onClick={() => dispatch(removeCartItem(item.id))}
         className="hidden md:flex items-center mt-4 md:mt-0 text-red-500 hover:text-red-700"
       >
         <Trash2 size={20} />
@@ -71,7 +103,18 @@ const CartItem = ({ item, onRemove, onDecrease, onIncrease, onQuantityChange }: 
         <div className="flex items-center mt-4 md:mt-0">
           <div className="border border-gray-600 rounded-lg">
             <button
-              onClick={() => onDecrease(item.id)}
+              onClick={() => {
+                if (quantityInputRef.current?.value)
+                  dispatch(
+                    cartItemQuantChange({
+                      id: item.id,
+                      quantity:
+                        +quantityInputRef.current.value > 0
+                          ? +quantityInputRef.current.value - 1
+                          : 0
+                    })
+                  );
+              }}
               className="text-gray-600 h-[20px] font-bold px-1 py-1 m-1 rounded inline-flex items-center"
             >
               -
@@ -79,11 +122,26 @@ const CartItem = ({ item, onRemove, onDecrease, onIncrease, onQuantityChange }: 
             <input
               type="number"
               value={item.quantity}
-              onChange={e => onQuantityChange(item.id, +e.target.value)}
+              onChange={(e) =>
+                dispatch(
+                  cartItemQuantChange({
+                    id: item.id,
+                    quantity: +e.target.value < 0 ? 0 : +e.target.value
+                  })
+                )
+              }
               className="w-12 text-center"
             />
             <button
-              onClick={() => onIncrease(item.id)}
+              onClick={() => {
+                if (quantityInputRef.current?.value)
+                  dispatch(
+                    cartItemQuantChange({
+                      id: item.id,
+                      quantity: +quantityInputRef.current.value + 1
+                    })
+                  );
+              }}
               className=" text-gray-600 h-[20px] font-bold px-1 py-1 m-1 rounded inline-flex items-center"
             >
               +
@@ -96,7 +154,7 @@ const CartItem = ({ item, onRemove, onDecrease, onIncrease, onQuantityChange }: 
         </div>
 
         <button
-          onClick={() => onRemove(item.id)}
+          onClick={() => dispatch(removeCartItem(item.id))}
           className="flex items-center mt-4 md:mt-0 text-red-500 hover:text-red-700"
         >
           <Trash2 size={20} />
@@ -106,4 +164,4 @@ const CartItem = ({ item, onRemove, onDecrease, onIncrease, onQuantityChange }: 
   );
 };
 
-export default CartItem
+export default CartItem;

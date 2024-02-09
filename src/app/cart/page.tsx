@@ -1,85 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
 import { Separator } from '@/components/ui/separator';
 import CartItem from '@/components/customs/cart/CartItem';
-
-// Cart items type
-export type TCartItem = {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-};
-
-// A mock data for the items in the cart
-const items: TCartItem[] = [
-  {
-    id: 1,
-    name: 'iPhone 13',
-    price: 999,
-    quantity: 4,
-    image:
-      'https://raw.githubusercontent.com/adrianhajdin/ecommerce/main/public/admin%20ui/products/airpods-max.png'
-  },
-  {
-    id: 2,
-    name: 'MacBook Pro',
-    price: 1999,
-    quantity: 1,
-    image:
-      'https://raw.githubusercontent.com/adrianhajdin/ecommerce/main/public/admin%20ui/products/15-inch-macbook-air-2tb-midnight.png'
-  },
-  {
-    id: 3,
-    name: 'AirPods Pro',
-    price: 249,
-    quantity: 3,
-    image:
-      'https://raw.githubusercontent.com/adrianhajdin/ecommerce/main/public/admin%20ui/products/13-inch-macbokk-air-256gb-space-gray.png'
-  }
-];
+import { useSelector } from 'react-redux';
+import { RootState } from '@/lib/redux/store';
 
 // The main component for the cart page
 const CartPage = () => {
-  // A state for storing the items in the cart
-  const [cartItems, setCartItems] = useState(items);
-
-  // A function for removing an item from the cart by id
-  const handleRemove = (id: number) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  };
+  const cartItems = useSelector((state: RootState) => state.cart.cartItems);
 
   // A function for calculating the total price of the items in the cart
   const getTotalPrice = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  };
-
-  // A function for decreasing the quantity of an item by id
-  const onDecrease = (id: number) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity > 0 ? --item.quantity : 0 } : item
-      )
-    );
-  };
-
-  // // A function for increasing the quantity of an item by id
-  const onIncrease = (id: number) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: ++item.quantity } : item
-      )
-    );
-  };
-
-  // A function for changing the quantity of an item by id and value
-  const onQuantityChange = (id: number, quantity: number) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: quantity < 0 ? 0 : quantity } : item
-      )
+    return cartItems.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
     );
   };
 
@@ -89,16 +23,7 @@ const CartPage = () => {
       <div className="grid lg:grid-cols-12 sm:grid-cols-6 gap-8">
         <div className="lg:col-span-8 sm:col-span-6">
           {cartItems.length > 0 ? (
-            cartItems.map((item) => (
-              <CartItem
-                key={item.id}
-                item={item}
-                onRemove={handleRemove}
-                onDecrease={onDecrease}
-                onIncrease={onIncrease}
-                onQuantityChange={onQuantityChange}
-              />
-            ))
+            cartItems.map((item) => <CartItem key={item.id} item={item} />)
           ) : (
             <p className="text-center text-gray-400">Your cart is empty.</p>
           )}

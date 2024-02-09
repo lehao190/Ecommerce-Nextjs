@@ -1,5 +1,9 @@
-'use client';
+import StoreProvider from './StoreProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <main>{children}</main>;
+  return (
+    <main>
+      <StoreProvider>{children}</StoreProvider>
+    </main>
+  );
 }

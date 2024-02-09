@@ -13,6 +13,8 @@ import { ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import StarRating from './StarRating';
 import Link from 'next/link';
+import { useDispatch } from 'react-redux'
+import { addCartItem } from '@/lib/redux/features/cart/cartSlice';
 
 type Props = {
   id: number;
@@ -24,9 +26,18 @@ type Props = {
 
 // A component that renders a product card
 const ProductItem = ({ id, name, starRating, price, image }: Props) => {
+  const dispatch = useDispatch();
+
   const addToCart = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    console.log('Add to cart');
+
+    dispatch(addCartItem({
+      id,
+      name,
+      price,
+      quantity: 1,
+      image
+    }));
   };
 
   return (
