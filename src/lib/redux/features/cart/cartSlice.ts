@@ -1,3 +1,4 @@
+import { findItemById, findItemByIndex } from '@/lib/utils';
 import { TCartItem } from '@/types/cart.types';
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
@@ -10,26 +11,13 @@ const initialState: TCartState = {
   cartItems: []
 };
 
-const findCartItem = (cartItems: TCartItem[], id: number) => {
-  return cartItems.find((cartItem) => cartItem.id === id);
-};
-
-const findCartItemIndex = (cartItems: TCartItem[], id: number) => {
-  const foundIndex = cartItems.findIndex(cartItem => cartItem.id === id);
-
-  if(foundIndex !== -1)
-    return foundIndex;
-
-  return -1;
-};
-
 export const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
     // Add product item to cart
     addCartItem: (state, action: PayloadAction<TCartItem>) => {
-      if(findCartItem(state.cartItems, action.payload.id))
+      if(findItemById(state.cartItems, action.payload.id))
         return;
       
       state.cartItems = [action.payload, ...state.cartItems];
@@ -44,7 +32,7 @@ export const cartSlice = createSlice({
 
     // Update cart item quantity
     cartItemQuantChange: (state, action: PayloadAction<{ id: number, quantity: number }>) => {
-      const foundIndex = findCartItemIndex(state.cartItems, action.payload.id);
+      const foundIndex = findItemByIndex(state.cartItems, action.payload.id);
 
       if(foundIndex !== -1) {
         state.cartItems[foundIndex].quantity = action.payload.quantity;

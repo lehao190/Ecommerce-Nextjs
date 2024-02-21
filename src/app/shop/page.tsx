@@ -2,34 +2,37 @@ import CustomCheckbox from '@/components/customs/inputs/CustomCheckbox';
 import CustomRadioGroup from '@/components/customs/inputs/CustomRadioGroup';
 import ProductList from '@/components/customs/shop/ProductList';
 import { Separator } from '@/components/ui/separator';
+import { TProductCategory, TProductPriceFilter } from '../../types/product.types';
+import { TCheckbox } from '@/types/inputs/checkbox.types';
+import { TRadioItem } from '@/types/inputs/radio.types';
 
-const checkboxes = [
+const checkboxes: TCheckbox[] = [
   {
-    text: 'Laptop',
-    value: 'laptop',
-    checked: true
+    text: 'Electrics',
+    value: 'ELECTRONICS',
+    checked: false
   },
   {
-    text: 'TV',
-    value: 'tv',
+    text: 'Accessories',
+    value: 'ACCESSORIES',
     checked: false
   },
   {
     text: 'Clothes',
-    value: 'clothes',
+    value: 'CLOTHES',
     checked: false
   },
   {
     text: 'Shoes',
-    value: 'shoes',
-    checked: true
+    value: 'SHOES',
+    checked: false
   }
-] as const;
+];
 
-const radioGroupItems = [
+const radioGroupItems: TRadioItem[] = [
   {
     text: 'All',
-    value: 'all'
+    value: 'ALL'
   },
   {
     text: '< $200',
@@ -45,7 +48,31 @@ const radioGroupItems = [
   }
 ];
 
-const Shop = () => {
+let DEFAULT_RADIO_ITEM_FILTER: TProductPriceFilter = 'ALL';
+
+type TUrlQuery = 'price_filter' | TProductCategory;
+
+const Shop = ({
+  searchParams
+}: {
+  searchParams: { [key in TUrlQuery]: 'true' | TProductPriceFilter | undefined };
+}) => {
+  // Mutate checkboxes values based on url queries
+  checkboxes.map((checkbox) => {
+    if(searchParams[checkbox.value]) {
+      checkbox.checked = true;
+    } else {
+      checkbox.checked = false;
+    }
+  });
+
+  // Mutate radio group value based on URL query
+  if(searchParams && searchParams.price_filter != 'true' && searchParams.price_filter !== undefined) {
+    DEFAULT_RADIO_ITEM_FILTER = searchParams.price_filter;
+  } else {
+    DEFAULT_RADIO_ITEM_FILTER = 'ALL';
+  }
+
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-10 text-primary">Our Products</h1>
@@ -71,7 +98,7 @@ const Shop = () => {
             <h2 className="text-lg font-semibold text-gray-700">Prices</h2>
             {
               <CustomRadioGroup
-                defaultValue={radioGroupItems[0].value}
+                defaultValue={DEFAULT_RADIO_ITEM_FILTER}
                 radioGroupItems={radioGroupItems}
               />
             }
