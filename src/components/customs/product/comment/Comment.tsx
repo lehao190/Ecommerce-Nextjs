@@ -1,10 +1,12 @@
-
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import StarRating from '../StarRating';
+import { TComment } from '@/types/comment.types';
 
-type Props = {};
+type Props = {
+  comment: TComment;
+};
 
-const Comment = (props: Props) => {
+const Comment = ({ comment }: Props) => {
   return (
     <div className="flex">
       <Avatar className="h-[40px] w-[40px]">
@@ -13,16 +15,13 @@ const Comment = (props: Props) => {
       </Avatar>
 
       <div className="ml-2">
-        <h6 className="text-md font-semibold">Your Name</h6>
-        <p className="text-sm text-gray-400">19/12/2023</p>
+        <h6 className="text-md font-semibold">{ comment.username }</h6>
+        <p className="text-sm text-gray-400">{ comment.created_At }</p>
         <div className="mt-1">
-          <StarRating starRating={5} />
+          <StarRating starRating={comment.starRatings} />
         </div>
         <div className="text-sm">
-          Blown away by how polished this icon pack is. Everything looks so
-          consistent and each SVG is optimized out of the box so I can use it
-          directly with confidence. It would take me several hours to create a
-          single icon this good, so it's a steal at this price.
+          { comment.body }
         </div>
       </div>
     </div>

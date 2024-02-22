@@ -1,17 +1,8 @@
-'use client';
-
 import StarRating from '@/components/customs/product/StarRating';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import Image from 'next/image';
-import { useState } from 'react';
-import FormComponent from '@/components/customs/forms/Form';
-import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import Comment from '@/components/customs/product/comment/Comment';
-import { AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import QuantityControl from '@/components/customs/product/QuantityControl';
+import CommentPagination from '@/components/customs/product/comment/CommentPagination';
+import CommentForm from '@/components/customs/product/comment/CommentForm';
 
 type Props = {
   params: {
@@ -19,35 +10,9 @@ type Props = {
   };
 };
 
-const commentSchema = z.object({
-  comment: z.string().min(8, {
-    message: 'Comment must be at leaset 8 characters.'
-  }),
-  rating: z.number()
-});
-
-// Login form's fields
-type TCommentFields = z.infer<typeof commentSchema>;
-
 const Product = ({ params }: Props) => {
-  const [quantity, setQuantity] = useState('4');
-
-  const form = useForm<TCommentFields>({
-    resolver: zodResolver(commentSchema),
-    defaultValues: {
-      comment: '',
-      rating: 0
-    }
-  });
-
-  const onSubmit = async (values: TCommentFields) => {
-    console.log('Submit Comment: ', values);
-  };
-
   return (
     <div className="container mx-auto py-8">
-      {/* <h1 className="text-3xl font-bold mb-10">Product</h1> */}
-
       {/* Product details */}
       <section className="md:flex gap-8">
         <div className="grow max-w-[400px] h-[350px] relative mx-auto">
@@ -85,33 +50,8 @@ const Product = ({ params }: Props) => {
             all-day use.
           </div>
 
-          <div className="flex items-center">
-            <div className="flex justify-center items-center border border-gray-600 rounded-lg w-[100px]">
-              <button className="text-gray-600 h-[20px] font-bold px-1 py-1 m-1 rounded inline-flex items-center">
-                -
-              </button>
-              <Input
-                className="border-0 text-center h-[10px] font-bold"
-                type="number"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-              />
-              <button className=" text-gray-600 h-[20px] font-bold px-1 py-1 m-1 rounded inline-flex items-center">
-                +
-              </button>
-            </div>
-
-            <span className="ml-8 font-semibold">In Stock: {100}</span>
-          </div>
-
-          <div className="mt-8">
-            <Button
-              type="button"
-              className="w-[250px] h-[50px] text-white bg-primary hover:bg-pink-500 focus:ring-4 focus:ring-pink-300 font-medium rounded-full text-lg text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              Add to cart
-            </Button>
-          </div>
+          {/* Control the quantity of the product */}
+          <QuantityControl />
         </div>
       </section>
 
@@ -119,46 +59,13 @@ const Product = ({ params }: Props) => {
 
       {/* Reviews Form */}
       <section className="max-w-[400px]">
-        {/* <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            You need to login to be able to review.
-          </AlertDescription>
-        </Alert> */}
-
-        <FormComponent<TCommentFields>
-          fieldNames={[
-            {
-              field: 'rating',
-              type: 'number'
-            },
-            {
-              field: 'comment',
-              type: 'textarea'
-            }
-          ]}
-          form={form}
-          onSubmit={onSubmit}
-        >
-          <Button
-            type="submit"
-            className="text-white bg-primary hover:bg-pink-500 focus:ring-4 focus:ring-pink-300 font-medium rounded-full text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >
-            Submit
-          </Button>
-        </FormComponent>
+        <CommentForm />
       </section>
 
       <div className="font-bold text-xl mt-8 mb-4">REVIEWS</div>
-
+      
       {/* User Reviews */}
-      <section className="max-w-[1000px] flex flex-col gap-10">
-        <Comment />
-        <Comment />
-        <Comment />
-        <Comment />
-      </section>
+      <CommentPagination />
     </div>
   );
 };
