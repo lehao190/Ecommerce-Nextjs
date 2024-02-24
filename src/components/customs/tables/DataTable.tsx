@@ -22,7 +22,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
+// import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -31,13 +31,30 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
+import { useDispatch } from 'react-redux';
+import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 
-type Props<TData, TValue> = {
+type Props<
+  TData,
+  TValue,
+  TDispatchAction extends ActionCreatorWithPayload<number, string>
+> = {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  getItemsByPage: TDispatchAction;
 };
 
-const DataTable = <TData, TValue>({ columns, data }: Props<TData, TValue>) => {
+const DataTable = <
+  TData,
+  TValue,
+  TDispatchAction extends ActionCreatorWithPayload<number, string>
+>({
+  columns,
+  data,
+  getItemsByPage
+}: Props<TData, TValue, TDispatchAction>) => {
+  const dispatch = useDispatch();
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -68,14 +85,14 @@ const DataTable = <TData, TValue>({ columns, data }: Props<TData, TValue>) => {
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        <Input
+        {/* <Input
           placeholder="Filter emails..."
           value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
             table.getColumn('email')?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
-        />
+        /> */}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -172,8 +189,14 @@ const DataTable = <TData, TValue>({ columns, data }: Props<TData, TValue>) => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={async () => {
+              dispatch(getItemsByPage(2));
+
+              setTimeout(() => {
+                table.nextPage();
+              }, 0);
+            }}
+            // disabled={!table.getCanNextPage()}
           >
             Next
           </Button>

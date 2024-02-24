@@ -14,8 +14,8 @@ type TTabComponent = Record<TAccountTabItem, JSX.Element>;
 const componentTab: TTabComponent = {
   EDIT_USER: <EditUser />,
   PRODUCTS: <CreateProduct />,
+  PRODUCTS_LIST: <ProductTable />,
   ORDERS: <OrderTable />
-  // ORDERS: <ProductTable />
 };
 
 // Render component

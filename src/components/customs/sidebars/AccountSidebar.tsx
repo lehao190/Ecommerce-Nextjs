@@ -8,9 +8,9 @@ import {
   Contact
 } from 'lucide-react';
 
-export type TAccountTabItem = 'EDIT_USER' | 'PRODUCTS' | 'ORDERS';
+export type TAccountTabItem = 'EDIT_USER' | 'PRODUCTS' | 'PRODUCTS_LIST' | 'ORDERS';
 
-const TABS: TAccountTabItem[] = ['EDIT_USER', 'PRODUCTS', 'ORDERS'];
+const TABS: TAccountTabItem[] = ['EDIT_USER', 'PRODUCTS', 'PRODUCTS_LIST', 'ORDERS'];
 
 const menuItems = [
   {
@@ -19,7 +19,8 @@ const menuItems = [
     icon: <Contact size={22} />
   },
   { name: 'Products', tab: TABS[1], icon: <Store size={22} /> },
-  { name: 'My Orders', tab: TABS[2], icon: <Package size={22} /> },
+  { name: 'Product list', tab: TABS[2], icon: <Package size={22} /> },
+  { name: 'My Orders', tab: TABS[3], icon: <Package size={22} /> },
   { name: 'Logout', icon: <DoorClosed size={22} /> }
 ];
 

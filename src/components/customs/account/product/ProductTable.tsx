@@ -1,48 +1,16 @@
-import DataTable from '../../tables/DataTable';
-import { Product, productColumns } from './Columns';
+'use client';
 
-const data: Product[] = [
-  {
-    id: '1',
-    name: 'Random Product',
-    image:
-      'https://raw.githubusercontent.com/adrianhajdin/ecommerce/main/public/admin%20ui/products/airpods-max.png',
-    price: 316.4,
-    quantity: 8,
-    createdAt: '19/11/1999',
-  },
-  {
-    id: '2',
-    name: 'Random Product',
-    image:
-      'https://raw.githubusercontent.com/adrianhajdin/ecommerce/main/public/admin%20ui/products/airpods-max.png',
-    price: 316.4,
-    quantity: 8,
-    createdAt: '19/11/1999',
-  },
-  {
-    id: '3',
-    name: 'Random Product',
-    image:
-      'https://raw.githubusercontent.com/adrianhajdin/ecommerce/main/public/admin%20ui/products/airpods-max.png',
-    price: 316.4,
-    quantity: 8,
-    createdAt: '19/11/1999',
-  },
-  {
-    id: '4',
-    name: 'Random Product',
-    image:
-      'https://raw.githubusercontent.com/adrianhajdin/ecommerce/main/public/admin%20ui/products/airpods-max.png',
-    price: 316.4,
-    quantity: 8,
-    createdAt: '19/11/1999',
-  },
-];
+import { useSelector } from 'react-redux';
+import DataTable from '../../tables/DataTable';
+import { productColumns } from './Columns';
+import { RootState } from '@/lib/redux/store';
+import { getProductsByPage } from '@/lib/redux/features/product-admin/productSlice';
 
 const ProductTable = () => {
+  const productItems = useSelector((state: RootState) => state.product.productItems);
+
   return (
-    <DataTable columns={productColumns} data={data} />
+    <DataTable columns={productColumns} data={productItems} getItemsByPage={getProductsByPage} />
   );
 };
 

@@ -1,3 +1,5 @@
+'use client';
+
 import { ColumnDef } from '@tanstack/react-table';
 import {
   DropdownMenu,
@@ -11,6 +13,11 @@ import { MoreHorizontal, PenSquare, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import Image from 'next/image';
+import { useDispatch } from 'react-redux';
+import {
+  editProduct,
+  removeProduct
+} from '@/lib/redux/features/product-admin/productSlice';
 
 export type Product = {
   id: string;
@@ -93,7 +100,8 @@ export const productColumns: ColumnDef<Product>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original;
+      const product = row.original;
+      const dispatch = useDispatch();
 
       return (
         <DropdownMenu>
@@ -107,7 +115,15 @@ export const productColumns: ColumnDef<Product>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              // onClick={() => navigator.clipboard.writeText(product.id)}
+              onClick={() =>
+                dispatch(
+                  editProduct({
+                    ...product,
+                    name: 'Edited Product'
+                  })
+                )
+              }
               className="cursor-pointer"
             >
               <PenSquare size={20} className="" />
@@ -116,6 +132,7 @@ export const productColumns: ColumnDef<Product>[] = [
 
             <DropdownMenuItem
               className="cursor-pointer"
+              onClick={() => dispatch(removeProduct(+product.id))}
             >
               <Trash2 size={20} className="text-red-500" />
               <span className="ml-2 text-red-500">Remove</span>

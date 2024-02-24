@@ -2,12 +2,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import cartReducer from './features/cart/cartSlice';
 import shopReducer from './features/shop/shopSlice';
 import commentReducer from './features/comment/commentSlice';
+import productReducer from './features/product-admin/productSlice';
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       cart: cartReducer,
       shop: shopReducer,
+      product: productReducer,
       comment: commentReducer
     }
   });
