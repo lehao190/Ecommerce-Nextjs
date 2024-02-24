@@ -95,12 +95,14 @@ const products: TProduct[] = [
 
 type TShopState = {
   productItems: TProduct[];
+  currentProductItems: TProduct[];
   filterByCategories: TProductCategory[];
   filterByPrices: TProductPriceFilter;
 };
 
 const initialState: TShopState = {
-  productItems: products.slice(0, 8),
+  productItems: products,
+  currentProductItems: products.slice(0, 4),
   filterByCategories: [],
   filterByPrices: 'ALL'
 };
@@ -110,8 +112,8 @@ export const shopSlice = createSlice({
   initialState,
   reducers: {
     // Get products by page
-    getProductsByPage: (state, action: PayloadAction<TProduct[]>) => {
-      state.productItems = action.payload;
+    getProductsByPage: (state, action: PayloadAction<{ startOffSet: number, endOffset: number }>) => {
+      state.currentProductItems = products.slice(action.payload.startOffSet, action.payload.endOffset);
     },
 
     // Add category to the list of filter

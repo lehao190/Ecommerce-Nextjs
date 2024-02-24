@@ -1,44 +1,19 @@
 'use client';
 
-import React, { useState } from 'react'
 import Comment from './Comment';
 import Pagination from '../../Pagination';
-import { TComment } from '@/types/comment.types';
+import { RootState } from '@/lib/redux/store';
+import { useSelector } from 'react-redux';
+import { getCommentsByPage } from '@/lib/redux/features/comment/commentSlice';
 
-const comments: TComment[] = [
-  {
-    id: 1,
-    username: 'John Doe',
-    created_At: '19/12/2023',
-    starRatings: 4,
-    body: 'Blown away by how polished this icon pack is.'
-  },
-  {
-    id: 2,
-    username: 'Josh Fluke',
-    created_At: '12/1/2024',
-    starRatings: 4,
-    body: 'Blown away by how polished this icon pack is.'
-  },
-  {
-    id: 3,
-    username: 'Ricky',
-    created_At: '5/11/2023',
-    starRatings: 4,
-    body: 'Blown away by how polished this icon pack is.'
-  },
-  {
-    id: 4,
-    username: 'Alam adam',
-    created_At: '19/12/2023',
-    starRatings: 4,
-    body: 'Blown away by how polished this icon pack is.'
-  }
-];
 
 const CommentPagination = () => {
-  const [currentComments, setCurrentComments] = useState<TComment[]>(
-    comments.slice(0, 2)
+  const comments = useSelector(
+    (state: RootState) => state.comment.comments,
+  );
+
+  const currentComments = useSelector(
+    (state: RootState) => state.comment.currentComments,
   );
 
   return (
@@ -53,7 +28,7 @@ const CommentPagination = () => {
         <Pagination
           itemsPerPage={2}
           items={comments}
-          setCurrentItems={setCurrentComments}
+          getItemsByPage={getCommentsByPage}
         />
       </section>
     </>

@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { getProductsByPage } from '@/lib/redux/features/shop/shopSlice';
 import Pagination from '../Pagination';
 import ProductItem from '../product/ProductItem';
-import { TProduct } from '@/types/product.types';
 import { RootState } from '@/lib/redux/store';
 import { useSelector } from 'react-redux';
 
@@ -12,14 +11,14 @@ const ProductList = () => {
     (state: RootState) => state.shop.productItems
   );
 
-  const [currentProducts, setCurrentProducts] = useState<TProduct[]>(
-    productItems.slice(0, 8)
+  const currentProductItems = useSelector(
+    (state: RootState) => state.shop.currentProductItems
   );
 
   return (
     <>
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {productItems.map((product, index) => (
+        {currentProductItems.map((product, index) => (
           <ProductItem
             key={index}
             id={product.id}
@@ -32,9 +31,9 @@ const ProductList = () => {
 
         <section className="col-span-full">
           <Pagination
-            itemsPerPage={8}
+            itemsPerPage={4}
             items={productItems}
-            setCurrentItems={setCurrentProducts}
+            getItemsByPage={getProductsByPage}
           />
         </section>
       </section>
