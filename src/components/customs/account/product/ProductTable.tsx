@@ -1,16 +1,24 @@
 'use client';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import DataTable from '../../tables/DataTable';
 import { productColumns } from './Columns';
-import { RootState } from '@/lib/redux/store';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import { getProductsByPage } from '@/lib/redux/features/product-admin/productSlice';
+import { useEffect } from 'react';
 
 const ProductTable = () => {
   const productItems = useSelector((state: RootState) => state.product.productItems);
+  const meta = useSelector((state: RootState) => state.product.meta);
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    if(!productItems.length)
+      dispatch(getProductsByPage(1));
+  }, [])
 
   return (
-    <DataTable columns={productColumns} data={productItems} getItemsByPage={getProductsByPage} />
+    <DataTable meta={meta} columns={productColumns} data={productItems} getItemsByPage={getProductsByPage} />
   );
 };
 

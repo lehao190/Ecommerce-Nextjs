@@ -20,13 +20,22 @@ import {
 } from '@/lib/redux/features/product-admin/productSlice';
 
 export type Product = {
-  id: string;
-  image: string;
+  id: number;
   name: string;
-  quantity: number;
-  price: number;
-  createdAt: string;
+  price: string;
+  quantity: string;
+  category: string;
+  image: string;
 };
+
+// export type Product = {
+//   id: string;
+//   image: string;
+//   name: string;
+//   quantity: number;
+//   price: number;
+//   createdAt: string;
+// };
 
 export const productColumns: ColumnDef<Product>[] = [
   {
@@ -60,7 +69,8 @@ export const productColumns: ColumnDef<Product>[] = [
     accessorKey: 'image',
     cell: ({ row }) => (
       <div className="relative h-[40px] w-[40px]">
-        <Image src={row.getValue('image')} alt="Product image" fill />
+        <Image src="https://raw.githubusercontent.com/adrianhajdin/ecommerce/main/public/admin%20ui/products/airpods-max.png" alt="Product image" fill />
+        {/* <Image src={row.getValue('image')} alt="Product image" fill /> */}
       </div>
     )
   },
@@ -93,7 +103,8 @@ export const productColumns: ColumnDef<Product>[] = [
     accessorKey: 'createdAt',
     header: 'Created At',
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue('createdAt')}</div>
+      <div className="capitalize">19/11/1999</div>
+      // <div className="capitalize">{row.getValue('createdAt')}</div>
     )
   },
   {

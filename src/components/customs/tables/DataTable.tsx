@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/table';
 import { useDispatch } from 'react-redux';
 import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
+import { TMeta } from '@/lib/redux/features/product-admin/productSlice';
 
 type Props<
   TData,
@@ -41,7 +42,9 @@ type Props<
 > = {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  getItemsByPage: TDispatchAction;
+  meta: TMeta;
+  getItemsByPage: any;
+  // getItemsByPage: TDispatchAction;
 };
 
 const DataTable = <
@@ -51,7 +54,8 @@ const DataTable = <
 >({
   columns,
   data,
-  getItemsByPage
+  getItemsByPage,
+  meta
 }: Props<TData, TValue, TDispatchAction>) => {
   const dispatch = useDispatch();
 
@@ -190,13 +194,13 @@ const DataTable = <
             variant="outline"
             size="sm"
             onClick={async () => {
-              dispatch(getItemsByPage(2));
+              dispatch(getItemsByPage(meta.next));
 
               setTimeout(() => {
                 table.nextPage();
               }, 0);
             }}
-            // disabled={!table.getCanNextPage()}
+            disabled={!table.getCanNextPage()}
           >
             Next
           </Button>

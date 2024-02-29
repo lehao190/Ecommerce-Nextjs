@@ -25,12 +25,14 @@ import FormComponent from '@/components/customs/forms/Form';
 
 // Sign up response type
 type TCreateProductResponse = {
-  product: {
+  createProduct: {
     id: number;
     name: string;
     description: string;
-    quantity: string;
-    image?: string;
+    category: string;
+    quantity: number;
+    price: number;
+    image: string;
   };
 };
 
@@ -53,7 +55,9 @@ const createProductSchema = z
       .min(20, {
         message: 'Desciption must be at leaset 20 characters.'
       }),
+    price: z.coerce.number().positive(),
     quantity: z.coerce.number().positive(),
+    category: z.string().min(3),
     image: z
       .custom<File>()
       .refine((file) => file.size < ONE_MEGABYTE, {
@@ -82,61 +86,75 @@ const CreateProduct = () => {
       name: '',
       description: '',
       quantity: 0,
+      price: 0,
+      category: 'LEXY'
     }
   });
 
-  // const signUp = async (values: TProductFields): Promise<boolean> => {
-  //   let base64Avatar: string | null = null;
+  const createProduct = async (values: TProductFields): Promise<boolean> => {
+    let base64Avatar: string | null = null;
 
-  //   // Converting image file to base64 encoding if chosen
-  //   if (values.image) {
-  //     base64Avatar = await convertFileToBase64(values.image);
-  //   }
+    // Converting image file to base64 encoding if chosen
+    if (values.image) {
+      base64Avatar = await convertFileToBase64(values.image);
+    }
 
-  //   const signUpCredentials = parse(gql`
-  //     mutation Register(
-  //       $username: String!
-  //       $email: String!
-  //       $password: String!
-  //       $image: String
-  //     ) {
-  //       register(
-  //         registerInput: {
-  //           username: $username
-  //           email: $email
-  //           password: $password
-  //           image: $image
-  //         }
-  //       ) {
-  //         id
-  //         username
-  //         email
-  //       }
-  //     }
-  //   `);
+    const createProductSchema = parse(gql`
+      mutation CreateProduct(
+        $name: String!
+        $description: String!
+        $category: String!
+        $price: Int!
+        $quantity: Int!
+        $image: String!
+      ) {
+        createProduct(
+          createProductInput: {
+            name: $name
+            description: $description
+            price: $price
+            quantity: $quantity
+            category: $category
+            image: $image
+          }
+        ) {
+          id
+          name
+          description
+          price
+          ratings
+        }
+      }
+    `);
 
-  //   const [_, error] = await handleRequest<TCreateProductResponse>(
-  //     signUpCredentials,
-  //     {
-  //       username: values.username,
-  //       email: values.email,
-  //       password: values.password,
-  //       image: base64Avatar
-  //     }
-  //   );
+    const [data, error] = await handleRequest<TCreateProductResponse>(
+      createProductSchema,
+      {
+        name: values.name,
+        description: values.description,
+        category: values.category,
+        price: values.price,
+        quantity: values.quantity,
+        image: base64Avatar
+      }
+    );
 
-  //   if (error?.status === 409) {
-  //     setAlertMessage(ALERT_MESSAGES[409]);
-  //     return false;
-  //   }
+    console.log('Create Product Success: ', data);
 
-  //   return true;
-  // };
+    if (error?.status === 409) {
+      setAlertMessage(ALERT_MESSAGES[409]);
+      return false;
+    }
+
+    return true;
+  };
 
   const onSubmit = async (values: z.infer<typeof createProductSchema>) => {
     console.log('Submit: ', values);
 
-    // setLoading(true);
+    setLoading(true);
+
+    await createProduct(values);
 
     // const isSignUpSuccess = await signUp(values);
 
@@ -162,7 +180,7 @@ const CreateProduct = () => {
     //   }
     // }
 
-    // setLoading(false);
+    setLoading(false);
   };
 
   return (
@@ -184,8 +202,16 @@ const CreateProduct = () => {
             type: 'textarea',
           },
           {
+            field: 'price',
+            type: 'number',
+          },
+          {
             field: 'quantity',
             type: 'number',
+          },
+          {
+            field: 'category',
+            type: 'text'
           },
         ]}
         form={form}

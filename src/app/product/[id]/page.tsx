@@ -3,14 +3,68 @@ import Image from 'next/image';
 import QuantityControl from '@/components/customs/product/QuantityControl';
 import CommentPagination from '@/components/customs/product/comment/CommentPagination';
 import CommentForm from '@/components/customs/product/comment/CommentForm';
+import { handleRequest } from '@/utils/handle-requests';
+import { parse } from 'graphql';
+import { gql } from 'graphql-request';
 
 type Props = {
   params: {
-    id: string;
+    id: number;
   };
 };
 
-const Product = ({ params }: Props) => {
+type TProductDetailsResponse = {
+  getProductDetails: {
+    id: number;
+    name: string;
+    description: string;
+    price: string;
+    quantity: string;
+    category: string;
+    ratings: number;
+    image: string;
+    comments: {
+      id: string;
+      text: string;
+      rating: number;
+    }[];
+  };
+};
+
+const getProductDetails = async (id: number) => {
+  const productDetailsQuery = parse(gql`
+    query GetProductDetails($id: Int!) {
+      getProductDetails(id: $id) {
+        id
+        name
+        description
+        price
+        quantity
+        category
+        ratings
+        image
+        comments {
+          id
+          text
+          rating
+        }
+      }
+    }
+  `);
+
+  const [data, _] = await handleRequest<TProductDetailsResponse>(
+    productDetailsQuery, 
+    {
+      id
+    }
+  );
+
+  return data?.getProductDetails;
+};
+
+const Product = async ({ params }: Props) => {
+  const data = await getProductDetails(+params.id);
+
   return (
     <div className="container mx-auto py-8">
       {/* Product details */}
@@ -29,10 +83,10 @@ const Product = ({ params }: Props) => {
 
         <div className="sm:max-w-[480px] lg:max-w-[750px] mt-8 md:mt-0">
           <h2 className="text-3xl font-semibold tracking-tight">
-            Zip Tote Basket
+            { data?.name }
           </h2>
           <h3 className="text-2xl text-primary font-semibold tracking-tight my-1">
-            $314
+            ${ data?.price }
           </h3>
 
           <div className="flex items-center">
@@ -43,11 +97,7 @@ const Product = ({ params }: Props) => {
           </div>
 
           <div className="my-3">
-            The Zip Tote Basket is the perfect midpoint between shopping tote
-            and comfy backpack. With convertible straps, you can hand carry,
-            should sling, or backpack this convenient and spacious bag. The zip
-            top and durable canvas construction keeps your goods protected for
-            all-day use.
+            { data?.description }
           </div>
 
           {/* Control the quantity of the product */}
@@ -63,7 +113,7 @@ const Product = ({ params }: Props) => {
       </section>
 
       <div className="font-bold text-xl mt-8 mb-4">REVIEWS</div>
-      
+
       {/* User Reviews */}
       <CommentPagination />
     </div>
